@@ -1,0 +1,26 @@
+@startuml
+entity roles { * id : INT <<PK>> --- name : VARCHAR }
+entity users { * id : INT <<PK>> --- role_id : INT <<FK>> full_name : VARCHAR email : VARCHAR password_hash : VARCHAR }
+entity stations { * id : INT <<PK>> --- name : VARCHAR city : VARCHAR }
+entity trains { * id : INT <<PK>> --- number : VARCHAR name : VARCHAR }
+entity routes { * id : INT <<PK>> --- name : VARCHAR }
+entity route_stops { * id : INT <<PK>> --- route_id : INT <<FK>> station_id : INT <<FK>> stop_order : INT offset_minutes : INT }
+entity trips { * id : INT <<PK>> --- route_id : INT <<FK>> train_id : INT <<FK>> departure_at : DATETIME price_base : DECIMAL }
+entity carriages { * id : INT <<PK>> --- train_id : INT <<FK>> number : INT type : VARCHAR }
+entity seats { * id : INT <<PK>> --- carriage_id : INT <<FK>> number : INT }
+entity bookings { * id : INT <<PK>> --- user_id : INT <<FK>> trip_id : INT <<FK>> seat_id : INT <<FK>> status : VARCHAR expires_at : DATETIME }
+entity tickets { * id : INT <<PK>> --- booking_id : INT <<FK>> code : VARCHAR price : DECIMAL }
+entity payments { * id : INT <<PK>> --- booking_id : INT <<FK>> amount : DECIMAL paid_at : DATETIME }
+roles ||--o{ users
+routes ||--o{ route_stops
+stations ||--o{ route_stops
+routes ||--o{ trips
+trains ||--o{ trips
+trains ||--o{ carriages
+carriages ||--o{ seats
+users ||--o{ bookings
+trips ||--o{ bookings
+seats ||--o{ bookings
+bookings ||--o| tickets
+bookings ||--o{ payments
+@enduml

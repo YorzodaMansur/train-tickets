@@ -1,0 +1,13 @@
+# Танзимоти махфӣ
+config/config.php
+.env
+# Зависимостҳо
+vendor/
+# Файлҳои боркардашуда
+public/uploads/*
+!public/uploads/.gitkeep
+# Системавӣ
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

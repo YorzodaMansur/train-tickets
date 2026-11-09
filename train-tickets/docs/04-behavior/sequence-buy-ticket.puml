@@ -1,0 +1,15 @@
+@startuml
+actor Мусофир
+participant "Браузер" as B
+participant "Controller" as C
+participant "Repository" as R
+database "MySQL" as DB
+Мусофир -> B : Интихоби ҷой
+B -> C : POST /booking
+C -> R : isSeatFree(trip, seat)
+R -> DB : SELECT ...
+DB --> R : озод
+C -> R : createBooking(...)
+R -> DB : INSERT bookings
+C --> B : саҳифаи пардохт
+@enduml

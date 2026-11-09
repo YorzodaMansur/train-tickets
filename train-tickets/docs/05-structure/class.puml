@@ -1,0 +1,21 @@
+@startuml
+class User { id; full_name; email; password_hash; role }
+class Station { id; name; city }
+class Train { id; number; name }
+class Route { id; name }
+class Trip { id; departure_at; arrival_at; price_base }
+class Carriage { id; number; type }
+class Seat { id; number }
+class Booking { id; status; created_at; expires_at }
+class Ticket { id; code; price }
+class Payment { id; amount; paid_at }
+Route "1" -- "*" Trip
+Train "1" -- "*" Trip
+Train "1" -- "*" Carriage
+Carriage "1" -- "*" Seat
+User "1" -- "*" Booking
+Trip "1" -- "*" Booking
+Seat "1" -- "*" Booking
+Booking "1" -- "0..1" Ticket
+Booking "1" -- "*" Payment
+@enduml

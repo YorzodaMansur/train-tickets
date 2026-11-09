@@ -1,0 +1,11 @@
+@startuml
+package "public" { [index.php] [assets] }
+package "src" { [Controllers] [Repositories] [Core] }
+[views]
+database "MySQL"
+[index.php] --> [Controllers]
+[Controllers] --> [Repositories]
+[Controllers] --> [views]
+[Repositories] --> [MySQL]
+[Core] ..> [Controllers]
+@enduml

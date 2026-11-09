@@ -1,0 +1,6 @@
+@startuml
+node "Компютери корбар" { [Браузер] }
+node "Сервер (XAMPP)" { [Apache + PHP 8.2] database "MariaDB" }
+[Браузер] --> [Apache + PHP 8.2] : HTTP(S)
+[Apache + PHP 8.2] --> MariaDB : PDO
+@enduml
