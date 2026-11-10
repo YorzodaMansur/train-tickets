@@ -1,91 +1,140 @@
 
 @startuml class
 
-title Диаграммаи синфҳои системаи фурӯши чиптаҳои қатора
+title Railway Tickets - Диаграммаи синфҳо (Class Diagram)
 
 skinparam classAttributeIconSize 0
 skinparam linetype ortho
+skinparam packageStyle rectangle
 hide empty members
 
 ' =========================================
 ' 1. DOMAIN MODEL - МОДЕЛИ ДОМЕНӢ
 ' =========================================
 
-package "Domain Model" {
+package "Модели доменӣ (Domain Model)" {
 
-    class User <<Entity>> {
+    class Station <<entity>> {
         +id: int
-        +fullName: string
-        +email: string
-        -passwordHash: string
-        +phone: string
-        +role: UserRole
-        +isActive: bool
-    }
-
-    class Station <<Entity>> {
-        +id: int
-        +name: string
+        +code: string
+        +nameTj: string
+        +nameRu: string
         +city: string
-        +address: string
     }
 
-    class Route <<Entity>> {
+    class Route <<entity>> {
         +id: int
+        +code: string
         +name: string
-        +distance: float
+        +originStationId: int
+        +destinationStationId: int
+        +distanceKm: float
+        +estimatedMinutes: int
     }
 
-    class Trip <<Entity>> {
+    class Trip <<entity>> {
         +id: int
-        +departureDateTime: datetime
-        +arrivalDateTime: datetime
+        +trainNumber: string
+        +routeId: int
+        +departureTime: datetime
+        +arrivalTime: datetime
         +status: TripStatus
+        +basePrice: decimal
+        +getDuration(): string
     }
 
-    class Car <<Entity>> {
+    class Car <<entity>> {
         +id: int
+        +tripId: int
         +carNumber: int
         +carType: CarType
-        +basePrice: decimal
+        +totalSeats: int
+        +priceModifier: float
+        +calculatePrice(basePrice: decimal): decimal
     }
 
-    class Seat <<Entity>> {
+    class Seat <<entity>> {
         +id: int
+        +carId: int
         +seatNumber: int
-        +seatType: string
-        +price: decimal
+        +seatType: SeatType
+        +status: SeatStatus
+        +isAvailable(): bool
     }
 
-    class SeatReservation <<Entity>> {
+    class SeatReservation <<entity>> {
         +id: int
+        +userId: int
+        +tripId: int
+        +seatId: int
         +reservedAt: datetime
         +expiresAt: datetime
         +status: ReservationStatus
         +isExpired(): bool
+        +release(): bool
     }
 
-    class Ticket <<Entity>> {
+    class Ticket <<entity>> {
         +id: int
         +ticketNumber: string
-        +purchaseDate: datetime
+        +tripId: int
+        +carId: int
+        +seatId: int
+        +userId: ?int
+        +passengerName: string
+        +passengerDoc: string
         +price: decimal
         +status: TicketStatus
-        +generatePDF(): string
+        +purchaseChannel: string
+        +paidAt: ?datetime
+        +isRefundable(): bool
     }
 
-    class Payment <<Entity>> {
+    class User <<entity>> {
         +id: int
+        +username: string
+        -passwordHash: string
+        +fullName: string
+        +email: string
+        +phone: string
+        +role: Role
+        +isActive: bool
+    }
+
+    class Payment <<entity>> {
+        +id: int
+        +ticketId: int
         +amount: decimal
+        +paymentMethod: PaymentMethod
+        +transactionId: string
         +paymentDate: datetime
-        +paymentMethod: string
         +status: PaymentStatus
     }
 
-    enum UserRole {
+    enum Role {
         passenger
         cashier
         admin
+    }
+
+    enum CarType {
+        coupe
+        platzkart
+        lux
+        seating
+    }
+
+    enum SeatType {
+        standard
+        upper
+        lower
+        side
+    }
+
+    enum SeatStatus {
+        available
+        reserved
+        sold
     }
 
     enum TripStatus {
@@ -93,11 +142,6 @@ package "Domain Model" {
         departed
         arrived
         cancelled
-    }
-
-    enum CarType {
-        coupe
-        platzkart
     }
 
     enum ReservationStatus {
@@ -108,9 +152,16 @@ package "Domain Model" {
     }
 
     enum TicketStatus {
-        pending
+        booked
         paid
-        returned
+        refunded
+        cancelled
+    }
+
+    enum PaymentMethod {
+        cash
+        card
+        online
     }
 
     enum PaymentStatus {
@@ -125,12 +176,12 @@ package "Domain Model" {
 ' 2. DOMAIN RELATIONSHIPS - АЛОҚАҲО
 ' =========================================
 
-' Истгоҳҳо ва хатсайрҳо
-Station "1" <-- "0..*" Route : истгоҳи рафтан
-Station "1" <-- "0..*" Route : истгоҳи расидан
+' Истгоҳи оғоз ва анҷом
+Route "0..*" --> "1" Station : истгоҳи оғоз
+Route "0..*" --> "1" Station : истгоҳи анҷом
 
 ' Хатсайр ва қатнов
-Route "1" -- "0..*" Trip : хатсайр
+Route "1" <-- "0..*" Trip : қатновҳо
 
 ' Қатнов ва вагонҳо
 Trip "1" *-- "1..*" Car : вагонҳо
@@ -139,101 +190,115 @@ Trip "1" *-- "1..*" Car : вагонҳо
 Car "1" *-- "1..*" Seat : ҷойҳо
 
 ' Истифодабаранда ва бандкунии ҷой
-User "1" -- "0..*" SeatReservation : банд мекунад
+User "1" <-- "0..*" SeatReservation : банд мекунад
 
 ' Қатнов ва бандкунӣ
-Trip "1" -- "0..*" SeatReservation : бандкунӣ
+Trip "1" <-- "0..*" SeatReservation : қатнов
 
 ' Ҷой ва бандкунӣ
-Seat "1" -- "0..*" SeatReservation : ҷой
+Seat "1" <-- "0..*" SeatReservation : ҷой
 
 ' Истифодабаранда ва чипта
-User "1" -- "0..*" Ticket : мехарад
+User "0..1" <-- "0..*" Ticket : харидор
 
 ' Қатнов ва чипта
-Trip "1" -- "0..*" Ticket : чиптаҳо
+Trip "1" <-- "0..*" Ticket : чиптаҳо
+
+' Вагон ва чипта
+Car "1" <-- "0..*" Ticket : вагон
 
 ' Ҷой ва чипта
-Seat "1" -- "0..*" Ticket : ҷойи интихобшуда
+Seat "1" <-- "0..*" Ticket : ҷойи интихобшуда
 
 ' Чипта ва пардохт
-Ticket "1" -- "0..*" Payment : пардохтҳо
+Ticket "1" <-- "0..*" Payment : пардохтҳо
 
 ' Enum dependencies
-User ..> UserRole
-Trip ..> TripStatus
+User ..> Role
 Car ..> CarType
+Seat ..> SeatType
+Seat ..> SeatStatus
+Trip ..> TripStatus
 SeatReservation ..> ReservationStatus
 Ticket ..> TicketStatus
+Payment ..> PaymentMethod
 Payment ..> PaymentStatus
 
 ' =========================================
-' 3. APPLICATION LAYER - ҚИСМИ БАРНОМА
+' 3. APPLICATION MODEL - СИНФҲОИ ЗАМИМА
 ' =========================================
 
-package "Application Layer" {
+package "Синфҳои замима (src/)" {
 
-    class TicketController <<Controller>> {
-        +searchTrips(): void
-        +selectSeats(tripId: int): void
-        +holdSeat(seatId: int): void
-        +pay(reservationId: int): void
-        +downloadPDF(ticketId: int): void
-        +returnTicket(ticketId: int): void
-    }
-
-    class TripController <<Controller>> {
+    class BookingController <<Controller>> {
+        -seatRepo: SeatRepository
+        -ticketRepo: TicketRepository
+        -tripRepo: TripRepository
+        -auth: Auth
         +search(): void
-        +showDetails(tripId: int): void
+        +seatMap(tripId: int, carId: int): void
+        +hold(tripId: int, seatId: int): void
+        +checkout(): void
+        +processPayment(): void
+        +viewTicket(ticketId: int): void
+        +cancelTicket(ticketId: int): void
     }
 
-    class AuthController <<Controller>> {
-        +register(): void
-        +login(): void
-        +logout(): void
+    class SeatRepository <<Repository>> {
+        -db: Database
+        +getByCar(carId: int): array
+        +lockSeatTemporary(seatId: int, userId: int, minutes: int): bool
+        +releaseExpiredLocks(): int
+        +confirmPurchase(seatId: int, userId: int): bool
     }
 
     class TripRepository <<Repository>> {
-        +searchTrips(from: int, to: int, date: date): array
-        +getTripById(id: int): array
+        -db: Database
+        +searchTrips(from: int, to: int, date: string): array
+        +findById(id: int): ?array
         +getAvailableSeats(tripId: int): array
     }
 
     class TicketRepository <<Repository>> {
-        +holdSeat(userId: int, tripId: int, seatId: int): int
+        -db: Database
         +createTicket(data: array): int
-        +findById(id: int): array
-        +updateStatus(id: int, status: string): bool
-        +releaseExpiredReservations(): int
+        +findById(id: int): ?array
+        +findByNumber(number: string): ?array
+        +refundTicket(ticketId: int, cashierId: int): bool
+        +getSalesReport(startDate: string, endDate: string): array
     }
 
-    class UserRepository <<Repository>> {
-        +createUser(data: array): int
-        +findByEmail(email: string): array
-        +findById(id: int): array
+    class PaymentRepository <<Repository>> {
+        -db: Database
+        +createPayment(data: array): int
+        +findByTicketId(ticketId: int): array
+        +updateStatus(id: int, status: string): bool
     }
 
     class Database <<Database>> {
         -pdo: PDO
-        +connect(): PDO
         +getConnection(): PDO
+        +query(sql: string, params: array): PDOStatement
     }
 
-    class AuthService <<Service>> {
-        +register(): bool
-        +login(): bool
-        +logout(): void
+    class Auth <<Service>> {
+        +user(): ?array
+        +id(): ?int
+        +hasRole(role: string): bool
+        +check(): bool
     }
 
     class PaymentService <<Service>> {
-        +processPayment(): bool
-        +refundPayment(): bool
+        -paymentRepo: PaymentRepository
+        +processPayment(ticketId: int): bool
+        +refundPayment(ticketId: int): bool
     }
 
-    class SeatReservationService <<Service>> {
-        +reserveSeat(): bool
-        +checkExpiration(): bool
-        +releaseSeat(): bool
+    class ReservationService <<Service>> {
+        -seatRepo: SeatRepository
+        +reserveSeat(seatId: int, userId: int): bool
+        +checkExpiration(): int
+        +releaseSeat(seatId: int): bool
     }
 }
 
@@ -241,22 +306,37 @@ package "Application Layer" {
 ' 4. APPLICATION RELATIONSHIPS
 ' =========================================
 
-TicketController --> TripRepository
-TicketController --> TicketRepository
-TicketController --> PaymentService
-TicketController --> SeatReservationService
+BookingController --> SeatRepository
+BookingController --> TicketRepository
+BookingController --> TripRepository
+BookingController --> PaymentService
+BookingController --> ReservationService
+BookingController --> Auth
 
-TripController --> TripRepository
-AuthController --> UserRepository
-AuthController --> AuthService
-
+SeatRepository --> Database
 TripRepository --> Database
 TicketRepository --> Database
-UserRepository --> Database
+PaymentRepository --> Database
 
-PaymentService ..> Payment
-SeatReservationService ..> SeatReservation
-TicketRepository ..> Ticket
-TripRepository ..> Trip
+PaymentService --> PaymentRepository
+ReservationService --> SeatRepository
+
+BookingController ..> Ticket : идоракунии чипта
+BookingController ..> Seat : интихоби ҷой
+BookingController ..> Trip : ҷустуҷӯи қатнов
+
+SeatRepository ..> SeatReservation : бандкунии муваққатӣ
+TicketRepository ..> Ticket : сохтани чипта
+PaymentRepository ..> Payment : сабти пардохт
+
+note right of SeatReservation
+  Муҳлати бандкунӣ: 15 дақиқа.
+
+  Агар пардохт анҷом нашавад:
+  1. Бандкунӣ бекор мешавад.
+  2. Ҷой озод мегардад.
+  3. Ҷой барои дигар мусофир
+     дастрас мешавад.
+end note
 
 @enduml
