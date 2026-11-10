@@ -5,8 +5,8 @@
 
 -- 1. Корбарон
 INSERT INTO users (id, username, password_hash, full_name, email, phone, role, is_active) VALUES
-(1, 'admin', '$2y$10$Hjv9M2cjK/XVIBNG7f/AH.OkszaLug0G93sKA1I6yyTouvnS0RJUm', 'Раҳимов Фарҳод (Маъмур)', 'admin@railway.tj', '+992927001122', 'admin', 1),
-(2, 'cashier1', '$2y$10$po.8.uhxYWs7OpE8GDs13umGSlVITaK9.1rHghobheK6j7FNrnmly', 'Саидова Нигина (Кассири Вокзал)', 'cashier@railway.tj', '+992928883344', 'cashier', 1),
+(1, 'admin', '$2y$10$Hjv9M2cjK/XVIBNG7f/AH.OkszaLug0G93sKA1I6yyTouvnS0RJUm', 'Ёрзода мансур (Маъмур)', 'admin@railway.tj', '+992927001122', 'admin', 1),
+(2, 'kassir', '$2y$10$po.8.uhxYWs7OpE8GDs13umGSlVITaK9.1rHghobheK6j7FNrnmly', 'Саидова Нигина (Кассири Вокзал)', 'cashier@railway.tj', '+992928883344', 'cashier', 1),
 (3, 'passenger1', '$2y$10$W7.GTr956rDRCM5UpCcoIuVtyIDHdZ5ShcPabTMlop991RpYxVfhS', 'Қосимов Ҷамшед', 'passenger@example.tj', '+992935556677', 'passenger', 1);
 
 -- 2. Истгоҳҳо
@@ -26,7 +26,7 @@ INSERT INTO routes (id, code, name, origin_station_id, destination_station_id, d
 (4, 'RT-04', 'Душанбе-1 — Бохтар', 2, 3, 115.00, 120),
 (5, 'RT-05', 'Хуҷанд — Конибодом', 1, 5, 80.00, 90);
 
--- 4. Қатнавҳо (Санаҳои оянда барои санҷиши бемамониат)
+-- 4. Қатнавҳо (Санаҳои оянда барои санҷиши бемониат)
 INSERT INTO trips (id, train_number, route_id, departure_time, arrival_time, status, base_price) VALUES
 (1, '027-ХД', 1, DATE_ADD(CURRENT_DATE(), INTERVAL 1 DAY) + INTERVAL 8 HOUR, DATE_ADD(CURRENT_DATE(), INTERVAL 1 DAY) + INTERVAL 14 HOUR, 'scheduled', 80.00),
 (2, '028-ДХ', 2, DATE_ADD(CURRENT_DATE(), INTERVAL 1 DAY) + INTERVAL 15 HOUR, DATE_ADD(CURRENT_DATE(), INTERVAL 1 DAY) + INTERVAL 21 HOUR, 'scheduled', 80.00),

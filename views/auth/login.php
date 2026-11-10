@@ -34,23 +34,6 @@
                         <i class="bi bi-box-arrow-in-right me-1"></i> Ворид шудан
                     </button>
                 </form>
-
-                <!-- Тугмаҳои санҷишии фаврӣ барои муҳофиза ва санҷиш -->
-                <div class="border-top pt-3 mt-2">
-                    <div class="text-muted small fw-bold mb-2 text-center">Ҳисобҳои санҷишӣ (бо як клик):</div>
-                    <div class="d-flex flex-column gap-2">
-                        <button type="button" class="btn btn-outline-info btn-sm text-start" onclick="fillDemo('admin', 'admin123')">
-                            <i class="bi bi-shield-lock-fill me-1"></i> <strong>Маъмур (Admin):</strong> admin / admin123
-                        </button>
-                        <button type="button" class="btn btn-outline-warning btn-sm text-start" onclick="fillDemo('cashier1', 'cashier123')">
-                            <i class="bi bi-cash me-1"></i> <strong>Кассири вокзал (Cashier):</strong> cashier1 / cashier123
-                        </button>
-                        <button type="button" class="btn btn-outline-success btn-sm text-start" onclick="fillDemo('passenger1', 'pass123')">
-                            <i class="bi bi-person-fill me-1"></i> <strong>Мусофир (Passenger):</strong> passenger1 / pass123
-                        </button>
-                    </div>
-                </div>
-
                 <div class="text-center mt-3 small">
                     Ҳисоб надоред? <a href="/register" class="text-decoration-none fw-bold">Бақайдгирӣ</a>
                 </div>
