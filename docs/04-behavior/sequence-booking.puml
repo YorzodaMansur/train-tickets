@@ -1,0 +1,48 @@
+@startuml sequence-booking
+title Банди муваққатӣ ба муддати 15 дақиқа ва хариди чипта (Sequence Diagram)
+
+actor "Мусофир\n(passenger)" as P
+participant "Браузер\n(Клиент)" as B
+participant "public/index.php\n+ Router" as R
+participant "BookingController" as C
+participant "SeatRepository\n+ TicketRepository" as Repo
+database "MySQL / MariaDB\n(railway_tickets)" as DB
+
+P -> B : Нақшаи вагонро кушода, ҷойи №5-ро интихоб мекунад
+B -> R : POST /booking/hold (trip_id=1, car_id=2, seat_id=5, csrf_token)
+R -> C : holdSeat(seatId, userId)
+C -> C : checkCsrfToken() ва checkUserSession()
+
+C -> Repo : lockSeatTemporary(seatId, userId, 15)
+Repo -> DB : SELECT status, reserved_until FROM seats WHERE id = ? FOR UPDATE
+DB --> Repo : сатри ҷой (status, reserved_until)
+
+alt ҷой холӣ аст ё (status = 'reserved' ва reserved_until < NOW())
+    Repo -> DB : UPDATE seats SET status = 'reserved', reserved_until = NOW() + INTERVAL 15 MINUTE, reserved_by_user_id = ? WHERE id = ?
+    DB --> Repo : 1 сатр нав карда шуд
+    Repo --> C : true (ҷой бо муваффақият банд шуд)
+    C --> B : 200 OK JSON {status: 'success', seat_id: 5, expires_in: 900}
+    B --> P : Ҷой ба ранги зард/кабуд табдил ёфт, таймер ба ҳисоби 15:00 сар шуд
+else ҷой фурӯхта шудааст ё ҳоло дар банди каси дигар аст
+    Repo --> C : false (ҷой банд аст)
+    C --> B : 409 Conflict JSON {status: 'error', message: 'Ҷой банд аст'}
+    B --> P : Огоҳинома: «Ин ҷой аллакай банд аст, лутфан дигар ҷойро интихоб кунед»
+end
+
+== Пардохти чипта пеш аз гузаштани 15 дақиқа ==
+
+P -> B : Пахши «Пардохт» бо ворид кардани маълумоти шиноснома
+B -> R : POST /booking/checkout (seat_id=5, passenger_name, doc_number)
+R -> C : processPayment(seatId, passengerData)
+C -> Repo : confirmPurchase(seatId, passengerData)
+
+Repo -> DB : UPDATE seats SET status = 'sold', reserved_until = NULL WHERE id = ? AND reserved_by_user_id = ?
+DB --> Repo : тасдиқ шуд
+Repo -> DB : INSERT INTO tickets (ticket_number, trip_id, seat_id, passenger_name, status, price) VALUES (...)
+DB --> Repo : ticket_id = 42
+
+Repo --> C : ticket (TKT-2026-0042)
+C --> B : 302 Redirect -> /tickets/view/42 («Харид бомуваффақият анҷом ёфт»)
+B --> P : Намоиши чиптаи тайёр бо тугмаи «Чопи PDF бо QR-код»
+
+@enduml

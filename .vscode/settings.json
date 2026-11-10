@@ -1,0 +1,8 @@
+{
+  "files.encoding": "utf8",
+  "plantuml.render": "PlantUMLServer",
+  "plantuml.server": "https://www.plantuml.com/plantuml",
+  "intelephense.environment.phpVersion": "8.2.0",
+  "intelephense.files.maxSize": 5000000,
+  "editor.formatOnSave": true
+}

@@ -1,0 +1,99 @@
+@startuml er-diagram
+title railway-tickets: диаграмма «сущность–связь» (ERD)
+skinparam linetype ortho
+
+entity "users" as users {
+    *id : int <<PK, AI>>
+    --
+    *username : varchar(50) <<UK>>
+    *password_hash : varchar(255)
+    *full_name : varchar(100)
+    email : varchar(100)
+    phone : varchar(30)
+    *role : varchar(20)
+    *is_active : tinyint(1)
+    *created_at : datetime
+}
+
+entity "stations" as stations {
+    *id : int <<PK, AI>>
+    --
+    *code : varchar(10) <<UK>>
+    *name_tj : varchar(100)
+    *name_ru : varchar(100)
+    *city : varchar(100)
+}
+
+entity "routes" as routes {
+    *id : int <<PK, AI>>
+    --
+    *code : varchar(20) <<UK>>
+    *name : varchar(150)
+    *origin_station_id : int <<FK>>
+    *destination_station_id : int <<FK>>
+    distance_km : decimal(8,2)
+    estimated_minutes : int
+}
+
+entity "trips" as trips {
+    *id : int <<PK, AI>>
+    --
+    *train_number : varchar(20)
+    *route_id : int <<FK>>
+    *departure_time : datetime
+    *arrival_time : datetime
+    *status : varchar(20)
+    *base_price : decimal(10,2)
+}
+
+entity "cars" as cars {
+    *id : int <<PK, AI>>
+    --
+    *trip_id : int <<FK>>
+    *car_number : int
+    *car_type : varchar(20)
+    *total_seats : int
+    *price_modifier : decimal(4,2)
+}
+
+entity "seats" as seats {
+    *id : int <<PK, AI>>
+    --
+    *car_id : int <<FK>>
+    *seat_number : int
+    *seat_type : varchar(20)
+    *status : varchar(20)
+    reserved_until : datetime
+    reserved_by_user_id : int <<FK>>
+}
+
+entity "tickets" as tickets {
+    *id : int <<PK, AI>>
+    --
+    *ticket_number : varchar(30) <<UK>>
+    *trip_id : int <<FK>>
+    *car_id : int <<FK>>
+    *seat_id : int <<FK>>
+    user_id : int <<FK>>
+    *passenger_name : varchar(100)
+    *passenger_doc : varchar(50)
+    *price : decimal(10,2)
+    *status : varchar(20)
+    *purchase_channel : varchar(20)
+    paid_at : datetime
+    *created_at : datetime
+    refunded_at : datetime
+    refunded_by_user_id : int <<FK>>
+}
+
+stations ||--o{ routes : "origin"
+stations ||--o{ routes : "destination"
+routes ||--o{ trips : "has"
+trips ||--o{ cars : "consists of"
+cars ||--|{ seats : "contains"
+seats ||--o| tickets : "assigned to"
+trips ||--o{ tickets : "issued for"
+users ||--o{ tickets : "bought by"
+users ||--o{ seats : "held by (15m)"
+
+@enduml

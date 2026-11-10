@@ -1,0 +1,47 @@
+@startuml component
+title railway-tickets: компонентҳо (MVC, меъмории сесатҳа)
+
+node "Мизоҷ (Client Side)" {
+    [Браузер\n(HTML5, Bootstrap 5.3, app.js,\nНақшаи интерактивӣ, Таймер 15:00)] as Browser
+}
+
+node "Веб-сервер (Apache дар XAMPP / PHP-FPM / CLI Server)" {
+    package "Сатҳи муаррифӣ (Presentation Layer)" {
+        [public/index.php\n(Front Controller)] as Front
+        [views/*.php\n(Шаблонҳои HTML/PHP)] as Views
+        [Core\\View] as ViewEngine
+    }
+
+    package "Сатҳи мантиқи тиҷоратӣ (Business Logic Layer)" {
+        [Core\\Router] as Router
+        [Controllers\n(Booking, Cashier, Admin,\nTrip, Auth, Home)] as Controllers
+        [Сервисҳо\n(Core\\Auth, Session,\nCsrf, Validator, Pdf)] as Services
+    }
+
+    package "Сатҳи дастрасӣ ба додаҳо (Data Access Layer)" {
+        [Repositories\n(Seat, Ticket, Trip,\nRoute, Station, User)] as Repos
+        [Core\\Database\n(PDO Wrapper)] as Db
+    }
+}
+
+database "MySQL 8.0 / MariaDB 10.4+\n(railway_tickets)\n[ё SQLite fallback]" as DB
+
+Browser --> Front : HTTP GET / POST
+Browser ..> Front : fetch /booking/hold (AJAX, JSON)
+Front --> Router : route(request)
+Router --> Controllers : dispatch(action)
+Controllers --> Services : checkAuth / CSRF / PDF
+Controllers --> Repos : query / persist
+Controllers --> ViewEngine : render(view, data)
+ViewEngine --> Views : include template
+Repos --> Db : prepare() / execute()
+Db --> DB : PDO TCP 3306 / local file
+
+legend right
+  <b>Меъмории MVC дар лоиҳа:</b>
+  • <b>Model:</b> Repositories + Core\\Database + Ҷадвалҳои МБДД
+  • <b>View:</b> Core\\View + views/**/*.php + assets (CSS/JS)
+  • <b>Controller:</b> Controllers/*Controller.php (тавассути Core\\Router)
+endlegend
+
+@enduml

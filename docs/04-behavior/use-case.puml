@@ -1,0 +1,52 @@
+@startuml use-case
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+
+title railway-tickets: диаграмма вариантов использования (Use Case)
+
+actor "Меҳмон / Мусофир\n(passenger)" as P
+actor "Кассири вокзал\n(cashier)" as C
+actor "Маъмури низом\n(admin)" as A
+
+rectangle "Веб-системаи фурӯши чиптаҳо (railway-tickets)" {
+    usecase "ФТ-01: Воридшавӣ ва бақайдгирӣ" as UC1
+    usecase "ФТ-02: Ҷустуҷӯи қатораҳо (самт, сана)" as UC2
+    usecase "ФТ-03: Дидани нақшаи вагон ва ҷойҳо" as UC3
+    usecase "ФТ-03: Санҷиши ҳолати ҷой" as UC4
+    usecase "ФТ-04: Банди муваққатӣ ба муддати 15 дақиқа" as UC5
+    usecase "ФТ-06: Расмиёти харид ва пардохти онлайн" as UC6
+    usecase "ФТ-07: Боргирӣ ва чопи чипта дар PDF" as UC7
+    usecase "ФТ-08: Фурӯши чипта дар касса (нақдӣ)" as UC8
+    usecase "ФТ-09: Баргардонидани чипта (refund)" as UC9
+    usecase "ФТ-10: Идоракунии хатсайрҳо ва қатораҳо" as UC10
+    usecase "ФТ-11: Танзими нархҳо ва вагонҳо" as UC11
+    usecase "ФТ-12: Таҳлил ва ҳисоботи фурӯш" as UC12
+}
+
+P --> UC1
+P --> UC2
+P --> UC3
+P --> UC5
+P --> UC6
+P --> UC7
+
+C --> UC1
+C --> UC2
+C --> UC3
+C --> UC8
+C --> UC9
+C --> UC7
+
+A --> UC1
+A --> UC10
+A --> UC11
+A --> UC12
+
+UC3 ..> UC4 : <<include>>
+UC5 ..> UC3 : <<include>>
+UC6 ..> UC5 : <<include>>
+UC6 ..> UC7 : <<include>>
+UC9 ..> UC8 : <<extend>>
+
+@enduml

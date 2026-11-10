@@ -1,0 +1,177 @@
+@startuml class
+title railway-tickets: диаграммаи синфҳо (Class Diagram)
+skinparam classAttributeIconSize 0
+hide empty members
+
+package "Модели доменӣ (Domain Model)" {
+    class Station <<entity>> {
+        +id: int
+        +code: string
+        +nameTj: string
+        +nameRu: string
+        +city: string
+    }
+
+    class Route <<entity>> {
+        +id: int
+        +code: string
+        +name: string
+        +originStationId: int
+        +destinationStationId: int
+        +distanceKm: float
+        +estimatedMinutes: int
+    }
+
+    class Trip <<entity>> {
+        +id: int
+        +trainNumber: string
+        +routeId: int
+        +departureTime: datetime
+        +arrivalTime: datetime
+        +status: TripStatus
+        +basePrice: decimal
+        +getDuration(): string
+    }
+
+    class Car <<entity>> {
+        +id: int
+        +tripId: int
+        +carNumber: int
+        +carType: CarType
+        +totalSeats: int
+        +priceModifier: float
+        +calculatePrice(basePrice: decimal): decimal
+    }
+
+    class Seat <<entity>> {
+        +id: int
+        +carId: int
+        +seatNumber: int
+        +seatType: SeatType
+        +status: SeatStatus
+        +reservedUntil: ?datetime
+        +reservedByUserId: ?int
+        +isAvailable(): bool
+    }
+
+    class Ticket <<entity>> {
+        +id: int
+        +ticketNumber: string
+        +tripId: int
+        +carId: int
+        +seatId: int
+        +userId: ?int
+        +passengerName: string
+        +passengerDoc: string
+        +price: decimal
+        +status: TicketStatus
+        +purchaseChannel: string
+        +paidAt: ?datetime
+        +isRefundable(): bool
+    }
+
+    class User <<entity>> {
+        +id: int
+        +username: string
+        -passwordHash: string
+        +fullName: string
+        +email: string
+        +phone: string
+        +role: Role
+        +isActive: bool
+    }
+
+    enum Role {
+        passenger
+        cashier
+        admin
+    }
+
+    enum CarType {
+        coupe
+        platzkart
+        lux
+        seating
+    }
+
+    enum SeatStatus {
+        available
+        reserved
+        sold
+    }
+
+    enum TicketStatus {
+        booked
+        paid
+        refunded
+        cancelled
+    }
+}
+
+Route "1" *-- "2" Station : оғоз ва анҷом
+Trip "0..*" --> "1" Route : аз рӯи хатсайр
+Trip "1" *-- "1..*" Car : таркиби вагонҳо
+Car "1" *-- "1..*" Seat : ҷойҳо дар вагон
+Ticket "0..*" --> "1" Trip : ба қатнав
+Ticket "1" --> "1" Seat : ҷойи интихобшуда
+Ticket "0..*" --> "0..1" User : харидор
+User "1" --> "0..*" Ticket : чиптаҳо
+Seat ..> SeatStatus
+Ticket ..> TicketStatus
+Car ..> CarType
+User ..> Role
+
+package "Синфҳои замима (src/)" {
+    class BookingController {
+        -seatRepo: SeatRepository
+        -ticketRepo: TicketRepository
+        -tripRepo: TripRepository
+        -auth: Auth
+        +search(): void
+        +seatMap(tripId: int, carId: int): void
+        +hold(tripId: int, seatId: int): void
+        +checkout(): void
+        +processPayment(): void
+        +viewTicket(ticketId: int): void
+    }
+
+    class SeatRepository {
+        -db: Database
+        +getByCar(carId: int): array
+        +lockSeatTemporary(seatId: int, userId: int, minutes: int): bool
+        +releaseExpiredLocks(): int
+        +confirmPurchase(seatId: int, userId: int): bool
+    }
+
+    class TicketRepository {
+        -db: Database
+        +createTicket(data: array): int
+        +findById(id: int): ?array
+        +findByNumber(number: string): ?array
+        +refundTicket(ticketId: int, cashierId: int): bool
+        +getSalesReport(startDate: string, endDate: string): array
+    }
+
+    class Database {
+        -pdo: PDO
+        +getConnection(): PDO
+        +query(sql: string, params: array): PDOStatement
+    }
+
+    class Auth {
+        +user(): ?array
+        +id(): ?int
+        +hasRole(role: string): bool
+        +check(): bool
+    }
+}
+
+BookingController --> SeatRepository
+BookingController --> TicketRepository
+BookingController --> Auth
+SeatRepository --> Database
+TicketRepository --> Database
+BookingController ..> Ticket : коркард ва тавлид
+SeatRepository ..> Seat : хондан/навсозӣ
+
+@enduml

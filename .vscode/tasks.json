@@ -1,0 +1,21 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Оғози сервери PHP (Start Local Server)",
+      "type": "shell",
+      "command": "php -S localhost:8000 -t public",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Иҷрои тестҳо (Run Tests)",
+      "type": "shell",
+      "command": "php tests/BookingTest.php",
+      "problemMatcher": []
+    }
+  ]
+}

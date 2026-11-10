@@ -1,0 +1,5 @@
+# Sessions and temporary caches
+storage/sessions/*
+!storage/sessions/.gitkeep
+*.log
+database/*.sqlite-journal
