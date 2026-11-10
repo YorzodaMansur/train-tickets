@@ -1,0 +1,262 @@
+
+@startuml class
+
+title Диаграммаи синфҳои системаи фурӯши чиптаҳои қатора
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+hide empty members
+
+' =========================================
+' 1. DOMAIN MODEL - МОДЕЛИ ДОМЕНӢ
+' =========================================
+
+package "Domain Model" {
+
+    class User <<Entity>> {
+        +id: int
+        +fullName: string
+        +email: string
+        -passwordHash: string
+        +phone: string
+        +role: UserRole
+        +isActive: bool
+    }
+
+    class Station <<Entity>> {
+        +id: int
+        +name: string
+        +city: string
+        +address: string
+    }
+
+    class Route <<Entity>> {
+        +id: int
+        +name: string
+        +distance: float
+    }
+
+    class Trip <<Entity>> {
+        +id: int
+        +departureDateTime: datetime
+        +arrivalDateTime: datetime
+        +status: TripStatus
+    }
+
+    class Car <<Entity>> {
+        +id: int
+        +carNumber: int
+        +carType: CarType
+        +basePrice: decimal
+    }
+
+    class Seat <<Entity>> {
+        +id: int
+        +seatNumber: int
+        +seatType: string
+        +price: decimal
+    }
+
+    class SeatReservation <<Entity>> {
+        +id: int
+        +reservedAt: datetime
+        +expiresAt: datetime
+        +status: ReservationStatus
+        +isExpired(): bool
+    }
+
+    class Ticket <<Entity>> {
+        +id: int
+        +ticketNumber: string
+        +purchaseDate: datetime
+        +price: decimal
+        +status: TicketStatus
+        +generatePDF(): string
+    }
+
+    class Payment <<Entity>> {
+        +id: int
+        +amount: decimal
+        +paymentDate: datetime
+        +paymentMethod: string
+        +status: PaymentStatus
+    }
+
+    enum UserRole {
+        passenger
+        cashier
+        admin
+    }
+
+    enum TripStatus {
+        scheduled
+        departed
+        arrived
+        cancelled
+    }
+
+    enum CarType {
+        coupe
+        platzkart
+    }
+
+    enum ReservationStatus {
+        active
+        expired
+        confirmed
+        cancelled
+    }
+
+    enum TicketStatus {
+        pending
+        paid
+        returned
+    }
+
+    enum PaymentStatus {
+        pending
+        completed
+        failed
+        refunded
+    }
+}
+
+' =========================================
+' 2. DOMAIN RELATIONSHIPS - АЛОҚАҲО
+' =========================================
+
+' Истгоҳҳо ва хатсайрҳо
+Station "1" <-- "0..*" Route : истгоҳи рафтан
+Station "1" <-- "0..*" Route : истгоҳи расидан
+
+' Хатсайр ва қатнов
+Route "1" -- "0..*" Trip : хатсайр
+
+' Қатнов ва вагонҳо
+Trip "1" *-- "1..*" Car : вагонҳо
+
+' Вагон ва ҷойҳо
+Car "1" *-- "1..*" Seat : ҷойҳо
+
+' Истифодабаранда ва бандкунии ҷой
+User "1" -- "0..*" SeatReservation : банд мекунад
+
+' Қатнов ва бандкунӣ
+Trip "1" -- "0..*" SeatReservation : бандкунӣ
+
+' Ҷой ва бандкунӣ
+Seat "1" -- "0..*" SeatReservation : ҷой
+
+' Истифодабаранда ва чипта
+User "1" -- "0..*" Ticket : мехарад
+
+' Қатнов ва чипта
+Trip "1" -- "0..*" Ticket : чиптаҳо
+
+' Ҷой ва чипта
+Seat "1" -- "0..*" Ticket : ҷойи интихобшуда
+
+' Чипта ва пардохт
+Ticket "1" -- "0..*" Payment : пардохтҳо
+
+' Enum dependencies
+User ..> UserRole
+Trip ..> TripStatus
+Car ..> CarType
+SeatReservation ..> ReservationStatus
+Ticket ..> TicketStatus
+Payment ..> PaymentStatus
+
+' =========================================
+' 3. APPLICATION LAYER - ҚИСМИ БАРНОМА
+' =========================================
+
+package "Application Layer" {
+
+    class TicketController <<Controller>> {
+        +searchTrips(): void
+        +selectSeats(tripId: int): void
+        +holdSeat(seatId: int): void
+        +pay(reservationId: int): void
+        +downloadPDF(ticketId: int): void
+        +returnTicket(ticketId: int): void
+    }
+
+    class TripController <<Controller>> {
+        +search(): void
+        +showDetails(tripId: int): void
+    }
+
+    class AuthController <<Controller>> {
+        +register(): void
+        +login(): void
+        +logout(): void
+    }
+
+    class TripRepository <<Repository>> {
+        +searchTrips(from: int, to: int, date: date): array
+        +getTripById(id: int): array
+        +getAvailableSeats(tripId: int): array
+    }
+
+    class TicketRepository <<Repository>> {
+        +holdSeat(userId: int, tripId: int, seatId: int): int
+        +createTicket(data: array): int
+        +findById(id: int): array
+        +updateStatus(id: int, status: string): bool
+        +releaseExpiredReservations(): int
+    }
+
+    class UserRepository <<Repository>> {
+        +createUser(data: array): int
+        +findByEmail(email: string): array
+        +findById(id: int): array
+    }
+
+    class Database <<Database>> {
+        -pdo: PDO
+        +connect(): PDO
+        +getConnection(): PDO
+    }
+
+    class AuthService <<Service>> {
+        +register(): bool
+        +login(): bool
+        +logout(): void
+    }
+
+    class PaymentService <<Service>> {
+        +processPayment(): bool
+        +refundPayment(): bool
+    }
+
+    class SeatReservationService <<Service>> {
+        +reserveSeat(): bool
+        +checkExpiration(): bool
+        +releaseSeat(): bool
+    }
+}
+
+' =========================================
+' 4. APPLICATION RELATIONSHIPS
+' =========================================
+
+TicketController --> TripRepository
+TicketController --> TicketRepository
+TicketController --> PaymentService
+TicketController --> SeatReservationService
+
+TripController --> TripRepository
+AuthController --> UserRepository
+AuthController --> AuthService
+
+TripRepository --> Database
+TicketRepository --> Database
+UserRepository --> Database
+
+PaymentService ..> Payment
+SeatReservationService ..> SeatReservation
+TicketRepository ..> Ticket
+TripRepository ..> Trip
+
+@enduml

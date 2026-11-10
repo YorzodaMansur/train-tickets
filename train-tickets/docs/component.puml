@@ -1,0 +1,185 @@
+
+@startuml component
+
+title Диаграммаи компонентҳои системаи фурӯши чиптаҳои қатора
+
+left to right direction
+
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+' =========================================
+' 1. CLIENT LAYER
+' =========================================
+
+package "1. Client Layer" {
+
+    component "Web Browser\nHTML / CSS / JavaScript" as Browser
+
+    component "Seat Selection UI\nИнтихоби ҷой" as SeatUI
+}
+
+' =========================================
+' 2. PRESENTATION LAYER
+' =========================================
+
+package "2. Presentation Layer" {
+
+    component "Front Controller\npublic/index.php" as Front
+
+    component "Router\nCore/Router" as Router
+
+    component "View\nCore/View" as View
+
+    component "Templates\nviews/*.php" as Templates
+}
+
+' =========================================
+' 3. BUSINESS LOGIC LAYER
+' =========================================
+
+package "3. Business Logic Layer" {
+
+    component "Ticket Controller" as TicketController
+
+    component "Trip Controller" as TripController
+
+    component "Auth Controller" as AuthController
+
+    component "Authentication Service" as AuthService
+
+    component "Payment Service" as PaymentService
+
+    component "Seat Reservation Service\n15-minute reservation" as ReservationService
+
+    component "PDF Service" as PDFService
+
+    component "Validation Service" as ValidationService
+}
+
+' =========================================
+' 4. DATA ACCESS LAYER
+' =========================================
+
+package "4. Data Access Layer" {
+
+    component "Trip Repository" as TripRepository
+
+    component "Ticket Repository" as TicketRepository
+
+    component "User Repository" as UserRepository
+
+    component "Database Connection\nPDO" as Database
+}
+
+' =========================================
+' 5. DATABASE
+' =========================================
+
+database "MySQL / MariaDB\ntrain_ticket_system" as MySQL
+
+' =========================================
+' 6. CONNECTIONS
+' =========================================
+
+' Client connections
+Browser --> Front : HTTP GET / POST
+
+Browser --> SeatUI : User interaction
+
+SeatUI --> Front : AJAX / JSON
+
+' Presentation connections
+Front --> Router : Request
+
+Router --> TicketController : Ticket routes
+
+Router --> TripController : Trip routes
+
+Router --> AuthController : Authentication routes
+
+TicketController --> View : Response
+
+TripController --> View : Response
+
+AuthController --> View : Response
+
+View --> Templates : Render HTML
+
+' Business logic connections
+TicketController --> PaymentService : Payment
+
+TicketController --> ReservationService : Reserve seat
+
+TicketController --> PDFService : Generate PDF
+
+TicketController --> ValidationService : Validate data
+
+TripController --> ValidationService : Validate search
+
+AuthController --> AuthService : Login / Register
+
+' Data access connections
+TripController --> TripRepository : Search trips
+
+TicketController --> TripRepository : Get trip information
+
+TicketController --> TicketRepository : Manage tickets
+
+AuthController --> UserRepository : Manage users
+
+AuthService --> UserRepository : User data
+
+PaymentService --> TicketRepository : Update ticket status
+
+ReservationService --> TicketRepository : Manage reservations
+
+TripRepository --> Database : SQL queries
+
+TicketRepository --> Database : SQL queries
+
+UserRepository --> Database : SQL queries
+
+Database --> MySQL : PDO / MySQL
+
+' =========================================
+' 7. NOTES
+' =========================================
+
+note right of ReservationService
+  Бандкунии ҷой барои 15 дақиқа.
+
+  Агар пардохт анҷом нашавад:
+  - Бандкунӣ бекор мешавад.
+  - Ҷой озод мегардад.
+end note
+
+note bottom of MySQL
+  Пойгоҳи додаҳо:
+  train_ticket_system
+
+  Нигоҳдории:
+  - Users
+  - Stations
+  - Routes
+  - Trips
+  - Cars
+  - Seats
+  - Reservations
+  - Tickets
+  - Payments
+end note
+
+legend right
+  Меъмории сеқабата:
+
+  1. Presentation Layer
+  2. Business Logic Layer
+  3. Data Access Layer
+
+  Client Layer - қисми муштарӣ
+  MySQL - пойгоҳи додаҳо
+endlegend
+
+@enduml
