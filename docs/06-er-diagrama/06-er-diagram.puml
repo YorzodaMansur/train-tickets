@@ -1,99 +1,167 @@
 @startuml er-diagram
-title railway-tickets: диаграмма «сущность–связь» (ERD)
+
+title train_ticket — Модели мантиқии пойгоҳи додаҳо
+
+hide circle
 skinparam linetype ortho
+skinparam entity {
+  BackgroundColor #F8F9FA
+  BorderColor #34495E
+}
+left to right direction
 
-entity "users" as users {
-    *id : int <<PK, AI>>
-    --
-    *username : varchar(50) <<UK>>
-    *password_hash : varchar(255)
-    *full_name : varchar(100)
-    email : varchar(100)
-    phone : varchar(30)
-    *role : varchar(20)
-    *is_active : tinyint(1)
-    *created_at : datetime
+' 1. USERS
+entity users {
+  * id : INT <<PK>>
+  --
+  * full_name : VARCHAR(150)
+  * email : VARCHAR(150) <<UQ>>
+  phone : VARCHAR(20)
+  * password_hash : VARCHAR(255)
+  * role : ENUM
+  * created_at : DATETIME
 }
 
-entity "stations" as stations {
-    *id : int <<PK, AI>>
-    --
-    *code : varchar(10) <<UK>>
-    *name_tj : varchar(100)
-    *name_ru : varchar(100)
-    *city : varchar(100)
+' 2. STATIONS
+entity stations {
+  * id : INT <<PK>>
+  --
+  * name : VARCHAR(120)
+  * city : VARCHAR(100)
+  * code : VARCHAR(20) <<UQ>>
 }
 
-entity "routes" as routes {
-    *id : int <<PK, AI>>
-    --
-    *code : varchar(20) <<UK>>
-    *name : varchar(150)
-    *origin_station_id : int <<FK>>
-    *destination_station_id : int <<FK>>
-    distance_km : decimal(8,2)
-    estimated_minutes : int
+' 3. ROUTES
+entity routes {
+  * id : INT <<PK>>
+  --
+  * route_name : VARCHAR(150)
+  * start_station_id : INT <<FK>>
+  * end_station_id : INT <<FK>>
 }
 
-entity "trips" as trips {
-    *id : int <<PK, AI>>
-    --
-    *train_number : varchar(20)
-    *route_id : int <<FK>>
-    *departure_time : datetime
-    *arrival_time : datetime
-    *status : varchar(20)
-    *base_price : decimal(10,2)
+' 4. ROUTE STATIONS
+entity route_stations {
+  * id : INT <<PK>>
+  --
+  * route_id : INT <<FK>>
+  * station_id : INT <<FK>>
+  * stop_order : INT
+  arrival_offset_minutes : INT
+  departure_offset_minutes : INT
 }
 
-entity "cars" as cars {
-    *id : int <<PK, AI>>
-    --
-    *trip_id : int <<FK>>
-    *car_number : int
-    *car_type : varchar(20)
-    *total_seats : int
-    *price_modifier : decimal(4,2)
+' 5. TRIPS
+entity trips {
+  * id : INT <<PK>>
+  --
+  * route_id : INT <<FK>>
+  * departure_datetime : DATETIME
+  * arrival_datetime : DATETIME
+  * base_price : DECIMAL(10,2)
+  * status : ENUM
 }
 
-entity "seats" as seats {
-    *id : int <<PK, AI>>
-    --
-    *car_id : int <<FK>>
-    *seat_number : int
-    *seat_type : varchar(20)
-    *status : varchar(20)
-    reserved_until : datetime
-    reserved_by_user_id : int <<FK>>
+' 6. CARS
+entity cars {
+  * id : INT <<PK>>
+  --
+  * car_number : INT
+  * car_type : ENUM
+  * status : ENUM
 }
 
-entity "tickets" as tickets {
-    *id : int <<PK, AI>>
-    --
-    *ticket_number : varchar(30) <<UK>>
-    *trip_id : int <<FK>>
-    *car_id : int <<FK>>
-    *seat_id : int <<FK>>
-    user_id : int <<FK>>
-    *passenger_name : varchar(100)
-    *passenger_doc : varchar(50)
-    *price : decimal(10,2)
-    *status : varchar(20)
-    *purchase_channel : varchar(20)
-    paid_at : datetime
-    *created_at : datetime
-    refunded_at : datetime
-    refunded_by_user_id : int <<FK>>
+' 7. TRIP CARS
+entity trip_cars {
+  * id : INT <<PK>>
+  --
+  * trip_id : INT <<FK>>
+  * car_id : INT <<FK>>
 }
 
-stations ||--o{ routes : "origin"
-stations ||--o{ routes : "destination"
-routes ||--o{ trips : "has"
-trips ||--o{ cars : "consists of"
-cars ||--|{ seats : "contains"
-seats ||--o| tickets : "assigned to"
-trips ||--o{ tickets : "issued for"
-users ||--o{ tickets : "bought by"
-users ||--o{ seats : "held by (15m)"
+' 8. SEATS
+entity seats {
+  * id : INT <<PK>>
+  --
+  * car_id : INT <<FK>>
+  * seat_number : VARCHAR(10)
+  * seat_type : ENUM
+}
+
+' 9. TRIP SEATS
+entity trip_seats {
+  * id : INT <<PK>>
+  --
+  * trip_id : INT <<FK>>
+  * seat_id : INT <<FK>>
+  * status : ENUM
+}
+
+' 10. TICKETS
+entity tickets {
+  * id : INT <<PK>>
+  --
+  * user_id : INT <<FK>>
+  * trip_seat_id : INT <<FK, UQ>>
+  * ticket_number : VARCHAR(30) <<UQ>>
+  * passenger_name : VARCHAR(150)
+  * passenger_document : VARCHAR(50)
+  * price : DECIMAL(10,2)
+  * status : ENUM
+  * purchased_at : DATETIME
+}
+
+' RELATIONSHIPS 1:N
+
+stations ||--o{ routes : start_station
+stations ||--o{ routes : end_station
+
+routes ||--o{ trips : has
+
+cars ||--o{ seats : contains
+
+users ||--o{ tickets : purchases
+
+' RELATIONSHIPS M:N
+
+routes ||--o{ route_stations : contains
+stations ||--o{ route_stations : belongs_to
+
+trips ||--o{ trip_cars : uses
+cars ||--o{ trip_cars : assigned_to
+
+' RELATIONSHIP 1:N
+
+trips ||--o{ trip_seats : has
+seats ||--o{ trip_seats : assigned_for
+
+' RELATIONSHIP 1:1
+
+trip_seats ||--o| tickets : reserved_by
+
+note bottom of route_stations
+  Ҷадвали васланда:
+  M:N байни хатсайрҳо ва истгоҳҳо.
+  Мушаххас(route_id, station_id)
+end note
+
+note bottom of trip_cars
+  Ҷадвали васланда:
+  M:N байни сафарҳо ва вагонҳо.
+  Мушаххас(trip_id, car_id)
+end note
+
+note bottom of trip_seats
+  Ҷойи муайяншуда барои сафар.
+  Мушаххас(trip_id, seat_id)
+  Як ҷой метавонад танҳо як
+  чипта дар сафари муайян дошта бошад.
+end note
+
+note bottom of tickets
+  Як чипта = як мусофир
+  ва як ҷойи муайяншуда.
+  trip_seat_id МУШАХХАС [UNIQUE] аст.
+end note
 
 @enduml
