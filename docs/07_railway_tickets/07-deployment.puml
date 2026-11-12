@@ -1,0 +1,28 @@
+@startuml deployment
+title railway_tickets — Диаграммаи ҷойгиркунии система
+left to right direction
+skinparam componentStyle rectangle
+skinparam linetype ortho
+
+node "Мизоҷ (Client)" as client {
+  artifact "Веб-браузер\nChrome / Edge" as browser
+}
+node "Веб-сервер (XAMPP)" as server {
+  artifact "Apache HTTP Server" as apache
+  component "PHP Application\ntrain-ticket" as app
+  artifact "phpMyAdmin" as pma
+}
+database "MariaDB / MySQL\nrailway_tickets\nInnoDB + utf8mb4" as db
+
+browser --> apache : HTTP / TCP 80\nHTTPS / TCP 443
+apache --> app : PHP request
+browser --> pma : HTTP / TCP 80
+app --> db : PDO / MySQL\nTCP 3307
+pma --> db : MySQL protocol\nTCP 3307
+
+note bottom of db
+  Пойгоҳи додаҳо: railway_tickets
+  Рамзгузорӣ (Charset): utf8mb4
+  Муҳаррик (Engine): InnoDB
+end note
+@enduml
