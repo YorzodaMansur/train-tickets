@@ -9,16 +9,16 @@ participant "SeatRepository\n+ TicketRepository" as Repo
 database "MySQL / MariaDB\n(railway_tickets)" as DB
 
 P -> B : Нақшаи вагонро кушода, ҷойи №5-ро интихоб мекунад
-B -> R : POST /booking/hold (trip_id=1, car_id=2, seat_id=5, csrf_token)
-R -> C : holdSeat(seatId, userId)
+B -> R : POST /booking/hold (trip_id=1, seat_id=5, csrf_token)
+R -> C : holdSeat(tripId, seatId, userId)
 C -> C : checkCsrfToken() ва checkUserSession()
 
-C -> Repo : lockSeatTemporary(seatId, userId, 15)
-Repo -> DB : SELECT status, reserved_until FROM seats WHERE id = ? FOR UPDATE
-DB --> Repo : сатри ҷой (status, reserved_until)
+C -> Repo : lockSeatTemporary(tripId, seatId, userId, 15)
+Repo -> DB : SELECT status, reserved_until FROM trip_seats WHERE trip_id = ? AND seat_id = ? FOR UPDATE
+DB --> Repo : сатри ҷой дар сафар (status, reserved_until)
 
 alt ҷой холӣ аст ё (status = 'reserved' ва reserved_until < NOW())
-    Repo -> DB : UPDATE seats SET status = 'reserved', reserved_until = NOW() + INTERVAL 15 MINUTE, reserved_by_user_id = ? WHERE id = ?
+    Repo -> DB : UPDATE trip_seats SET status = 'reserved', reserved_until = NOW() + INTERVAL 15 MINUTE, reserved_by_user_id = ? WHERE trip_id = ? AND seat_id = ?
     DB --> Repo : 1 сатр нав карда шуд
     Repo --> C : true (ҷой бо муваффақият банд шуд)
     C --> B : 200 OK JSON {status: 'success', seat_id: 5, expires_in: 900}
@@ -32,13 +32,13 @@ end
 == Пардохти чипта пеш аз гузаштани 15 дақиқа ==
 
 P -> B : Пахши «Пардохт» бо ворид кардани маълумоти шиноснома
-B -> R : POST /booking/checkout (seat_id=5, passenger_name, doc_number)
-R -> C : processPayment(seatId, passengerData)
-C -> Repo : confirmPurchase(seatId, passengerData)
+B -> R : POST /booking/checkout (trip_seat_id=..., passenger_name, doc_number)
+R -> C : processPayment(tripSeatId, passengerData)
+C -> Repo : confirmPurchase(tripSeatId, passengerData)
 
-Repo -> DB : UPDATE seats SET status = 'sold', reserved_until = NULL WHERE id = ? AND reserved_by_user_id = ?
+Repo -> DB : UPDATE trip_seats SET status = 'sold', reserved_until = NULL WHERE id = ? AND reserved_by_user_id = ?
 DB --> Repo : тасдиқ шуд
-Repo -> DB : INSERT INTO tickets (ticket_number, trip_id, seat_id, passenger_name, status, price) VALUES (...)
+Repo -> DB : INSERT INTO tickets (user_id, trip_seat_id, ticket_number, passenger_name, passenger_document, price, status, purchased_at) VALUES (...)
 DB --> Repo : ticket_id = 42
 
 Repo --> C : ticket (TKT-2026-0042)
