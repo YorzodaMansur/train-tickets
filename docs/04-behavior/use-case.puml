@@ -1,4 +1,4 @@
-@startuml use-case
+train-tickets/docs@startuml use-case
 left to right direction
 skinparam packageStyle rectangle
 skinparam actorStyle awesome
