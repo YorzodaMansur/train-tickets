@@ -1,244 +1,156 @@
-<!DOCTYPE html>
-<html lang="tg">
+<!doctype html>
+<html lang="tg" data-bs-theme="dark">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Роҳи Оҳани Тоҷикистон | Чиптаҳои қатора</title>
-
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Асосӣ — Роҳи Оҳани Тоҷикистон</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700;800&amp;display=swap"
+        rel="stylesheet">
+    <!-- Bootstrap 5.3 из CDN; integrity защищает от подмены файла -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-
-    <link rel="stylesheet" href="../assets/css/app.css">
+    <link href="../assets/css/app.css" rel="stylesheet">
 </head>
 
 <body>
-
-    <header class="site-header">
-        <nav class="navbar navbar-expand-lg container py-3">
-
-            <a class="navbar-brand fs-5" href="layout.html">
-                🚆 Роҳи Оҳани Тоҷикистон
-            </a>
-
-            <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
-                aria-label="Кушодани меню">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="mainNav">
-                <ul class="navbar-nav ms-auto gap-lg-3">
-
-                    <li class="nav-item">
-                        <a class="nav-link active" href="layout.html" aria-current="page">Асосӣ</a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="trips.html">
-                            Ҷадвали қатораҳо
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="../../login.php">
-                            Воридшавӣ
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="btn btn-primary px-3" href="../../register.php">
-                            Бақайдгирӣ
-                        </a>
-                    </li>
-
-                </ul>
+    <header>
+        <nav class="navbar navbar-expand-lg app-navbar" aria-label="Асосӣ">
+            <div class="container">
+                <a class="navbar-brand" href="layout.html">
+                    <span class="logo-mark" aria-hidden="true">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="5" y="3" width="14" height="14" rx="3" />
+                            <path d="M5 11h14M9 21l2-4M15 21l-2-4" />
+                        </svg>
+                    </span>
+                    <span><span class="brand-title">Роҳи Оҳани Тоҷикистон</span><span class="brand-sub">ЧИПТАҲОИ
+                            БАЙНИШАҲРӢ 2026–2027</span></span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                    aria-controls="mainNav" aria-expanded="false" aria-label="Кушодани меню">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="mainNav">
+                    <ul class="navbar-nav mx-lg-auto">
+                        <li class="nav-item"><a class="nav-link active" href="layout.html" aria-current="page">Асосӣ</a>
+                        </li>
+                        <li class="nav-item"><a class="nav-link" href="trains.html">Чадвали қатораҳо</a></li>
+                    </ul>
+                    <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-2">
+                        <a class="nav-link px-lg-2" href="#">Воридшавӣ</a>
+                        <a class="btn btn-primary" href="#">Бақайдгирӣ</a>
+                    </div>
+                </div>
             </div>
         </nav>
     </header>
 
-    <main class="container py-5">
-
-        <!-- HERO -->
-        <section class="hero mb-5">
-
-            <div class="row align-items-center">
-                <div class="col-lg-8">
-
-                    <span class="badge bg-info text-dark mb-3">
-                        САФАРИ ОНЛАЙН
-                    </span>
-
-                    <h1>
-                        ЧИПТАҲОИ БАЙНИШАҲРӢ
-                        <span class="text-info">2026–2027</span>
-                    </h1>
-
-                    <p class="mt-3">
-                        Чиптаи қатораро онлайн харидорӣ кунед.
-                        Вагон ва ҷойи дилхоҳи худро интихоб намоед.
-                    </p>
-
-                </div>
-
-                <div class="col-lg-4 text-center mt-4 mt-lg-0">
-                    <div style="font-size:100px">🚆</div>
-                </div>
+    <main>
+        <section class="container py-5 text-center" aria-labelledby="hero-title">
+            <p class="eyebrow">Технологияи насли нави фурӯши чиптаҳо 2026–2027</p>
+            <h1 id="hero-title" class="hero-title">Сафари бароҳат бо<br><span class="text-gradient">Қатораҳои
+                    Байнишаҳрӣ</span></h1>
+            <p class="lead text-secondary mx-auto" style="max-width:40rem">Ҷойи дилхоҳатонро дар нақшаи вагон онлайн
+                интихоб кунед. Ҷой ба муддати 15 дақиқа то пардохт барои Шумо банд нигоҳ дошта мешавад.</p>
+            <div class="d-flex flex-wrap justify-content-center gap-2 mb-5">
+                <a class="btn btn-primary px-4" href="#">Бақайдгирӣ</a>
+                <a class="btn btn-outline-light px-4" href="#">Воридшавӣ</a>
             </div>
 
-        </section>
-
-        <!-- SEARCH -->
-        <section class="search-box mb-5">
-
-            <h2 class="section-title h4 mb-4">
-                🔎 Ҷустуҷӯи чиптаи қатора
-            </h2>
-
-            <form action="trips.html" method="get">
-
-                <div class="row g-3">
-
-                    <div class="col-12 col-md-6 col-xl-3">
-                        <label for="from" class="form-label">Аз истгоҳ</label>
-
-                        <select class="form-select" id="from" name="from">
+            <form class="card search-card text-start p-3 p-md-4" method="get" action="trains.html" role="search"
+                aria-label="Ҷустуҷӯи қатнав">
+                <div class="row g-3 align-items-end">
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <label class="form-label" for="from_station">Аз куҷо (истгоҳ)</label>
+                        <select class="form-select" id="from_station" name="from_station">
+                            <option value="">Интихоби шаҳр/истгоҳ…</option>
                             <option value="dushanbe">Душанбе</option>
                             <option value="khujand">Хуҷанд</option>
+                            <option value="bokhtar">Бохтар</option>
+                            <option value="kulob">Кӯлоб</option>
                         </select>
                     </div>
-
-                    <div class="col-12 col-md-6 col-xl-3">
-                        <label for="to" class="form-label">Ба истгоҳ</label>
-
-                        <select class="form-select" id="to" name="to">
-                            <option value="khujand">Хуҷанд</option>
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <label class="form-label" for="to_station">Ба куҷо (истгоҳ)</label>
+                        <select class="form-select" id="to_station" name="to_station">
+                            <option value="">Интихоби шаҳр/истгоҳ…</option>
                             <option value="dushanbe">Душанбе</option>
+                            <option value="khujand">Хуҷанд</option>
+                            <option value="bokhtar">Бохтар</option>
+                            <option value="kulob">Кӯлоб</option>
                         </select>
                     </div>
-
-                    <div class="col-12 col-md-6 col-xl-3">
-                        <label for="date" class="form-label">Санаи сафар</label>
-
-                        <input type="date" class="form-control" id="date" name="date">
+                    <div class="col-6 col-xl-2">
+                        <label class="form-label" for="travel_date">Сана</label>
+                        <input class="form-control" type="date" id="travel_date" name="travel_date" value="2026-11-19">
                     </div>
-
-                    <div class="col-12 col-md-6 col-xl-3 d-flex align-items-end">
-                        <button class="btn btn-primary w-100" type="submit">
-                            Ҷустуҷӯи қатора
-                        </button>
+                    <div class="col-6 col-xl-2 d-grid"><button class="btn btn-primary" type="submit">Ҷустуҷӯ</button>
                     </div>
-
+                </div>
+                <hr>
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                    <strong class="me-2">Хатсайрҳои машҳур:</strong>
+                    <a class="chip" href="trains.html?from_station=dushanbe&amp;to_station=khujand">Душанбе → Хуҷанд</a>
+                    <a class="chip" href="trains.html?from_station=khujand&amp;to_station=dushanbe">Хуҷанд → Душанбе</a>
+                    <a class="chip" href="trains.html?from_station=dushanbe&amp;to_station=bokhtar">Душанбе → Бохтар</a>
+                    <a class="chip" href="trains.html?from_station=dushanbe&amp;to_station=kulob">Душанбе → Кӯлоб</a>
                 </div>
             </form>
-
         </section>
 
-        <!-- FEATURES -->
-        <section class="mb-5">
-
-            <h2 class="section-title text-center mb-4">
-                Имкониятҳои сомонаи мо
-            </h2>
-
-            <div class="row g-4">
-
-                <div class="col-12 col-md-6 col-xl-3">
-                    <div class="train-card h-100 text-center">
-                        <div class="feature-icon">🎫</div>
-                        <h3 class="h5">Хариди онлайн</h3>
-                        <p class="text-muted mb-0">
-                            Чиптаро бе рафтан ба касса харидорӣ кунед.
-                        </p>
-                    </div>
+        <section class="container pb-5" aria-labelledby="why-title">
+            <h2 id="why-title" class="mb-4">Чаро мо?</h2>
+            <div class="row g-3">
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <article class="card h-100">
+                        <div class="card-body">
+                            <div class="feature-icon" aria-hidden="true">1</div>
+                            <h3 class="h5">Ҷойи дилхоҳ</h3>
+                            <p class="mb-0 text-secondary">Ҷойро дар нақшаи вагон интихоб кунед.</p>
+                        </div>
+                    </article>
                 </div>
-
-                <div class="col-12 col-md-6 col-xl-3">
-                    <div class="train-card h-100 text-center">
-                        <div class="feature-icon">💺</div>
-                        <h3 class="h5">Интихоби ҷой</h3>
-                        <p class="text-muted mb-0">
-                            Вагон ва ҷойи дилхоҳи худро интихоб кунед.
-                        </p>
-                    </div>
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <article class="card h-100">
+                        <div class="card-body">
+                            <div class="feature-icon" aria-hidden="true">2</div>
+                            <h3 class="h5">15 дақиқа бронь</h3>
+                            <p class="mb-0 text-secondary">Ҷой то пардохт банд нигоҳ дошта мешавад.</p>
+                        </div>
+                    </article>
                 </div>
-
-                <div class="col-12 col-md-6 col-xl-3">
-                    <div class="train-card h-100 text-center">
-                        <div class="feature-icon">🕒</div>
-                        <h3 class="h5">Ҷадвали сафар</h3>
-                        <p class="text-muted mb-0">
-                            Вақти рафтан ва расидани қатораро бинед.
-                        </p>
-                    </div>
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <article class="card h-100">
+                        <div class="card-body">
+                            <div class="feature-icon" aria-hidden="true">3</div>
+                            <h3 class="h5">Чипта электронӣ</h3>
+                            <p class="mb-0 text-secondary">Чиптаро дар бахши «Чиптаҳои ман» чоп кунед.</p>
+                        </div>
+                    </article>
                 </div>
-
-                <div class="col-12 col-md-6 col-xl-3">
-                    <div class="train-card h-100 text-center">
-                        <div class="feature-icon">🔒</div>
-                        <h3 class="h5">Хариди бехатар</h3>
-                        <p class="text-muted mb-0">
-                            Маълумоти чипта ва фармоиши худро нигоҳ доред.
-                        </p>
-                    </div>
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <article class="card h-100">
+                        <div class="card-body">
+                            <div class="feature-icon" aria-hidden="true">4</div>
+                            <h3 class="h5">Нархи ошкор</h3>
+                            <p class="mb-0 text-secondary">Нархи ҳар як вагон пеш аз харид маълум аст.</p>
+                        </div>
+                    </article>
                 </div>
-
             </div>
         </section>
-
-        <!-- TRAIN TYPES -->
-        <section class="mb-5">
-
-            <h2 class="section-title mb-4">
-                Намудҳои вагон
-            </h2>
-
-            <div class="row g-4">
-
-                <div class="col-12 col-md-6 col-lg-4">
-                    <div class="train-card text-center">
-                        <div class="feature-icon">🚆</div>
-                        <h3 class="h5">СВ</h3>
-                        <p class="text-muted">Вагон бо шароити бароҳат.</p>
-                    </div>
-                </div>
-
-                <div class="col-12 col-md-6 col-lg-4">
-                    <div class="train-card text-center">
-                        <div class="feature-icon">🛏️</div>
-                        <h3 class="h5">Купе</h3>
-                        <p class="text-muted">Вагон бо ҷойҳои алоҳида.</p>
-                    </div>
-                </div>
-
-                <div class="col-12 col-md-6 col-lg-4">
-                    <div class="train-card text-center">
-                        <div class="feature-icon">💺</div>
-                        <h3 class="h5">Плацкарт</h3>
-                        <p class="text-muted">Вагон бо ҷойҳои умумӣ.</p>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
     </main>
 
-    <footer class="site-footer">
-        <div class="container text-center">
-            <h5 class="text-white">🚆 Роҳи Оҳани Тоҷикистон</h5>
-            <p class="mb-1">Системаи фурӯши онлайнии чиптаҳои қатора</p>
-            <p class="mb-0">© 2026–2027 Ҳамаи ҳуқуқҳо ҳифз шудаанд.</p>
-        </div>
+    <footer class="app-footer container py-4 text-center">
+        <p class="mb-0">&copy; 2026 Роҳи Оҳани Тоҷикистон. Лоиҳаи таълимӣ: фурӯши чиптаҳои қатораҳои байнишаҳрӣ.</p>
     </footer>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
-
 </body>
 
 </html>
