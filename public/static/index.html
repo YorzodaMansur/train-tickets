@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="tg">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Роҳи Оҳани Тоҷикистон — Ҷустуҷӯи чипта</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background: #0f172a;
+            color: #f8fafc;
+        }
+
+        .panel {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 16px;
+        }
+
+        .form-control,
+        .form-select {
+            background-color: #0f172a;
+            color: white;
+            border-color: #475569;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background-color: #0f172a;
+            color: white;
+        }
+
+        .error {
+            color: #f87171;
+            font-size: .85rem;
+            min-height: 20px;
+        }
+
+        .result-item {
+            padding: 12px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .result-item:last-child {
+            border-bottom: 0;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-dark bg-dark border-bottom border-secondary">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.html">🚆 Роҳи Оҳани Тоҷикистон</a>
+            <div>
+                <a class="btn btn-outline-info btn-sm" href="trains.html">Қатораҳо</a>
+                <a class="btn btn-outline-info btn-sm" href="my-tickets.html">Чиптаҳои ман</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-5">
+        <div class="text-center mb-4">
+            <h1 class="fw-bold">Чиптаҳои байнишаҳрӣ</h1>
+            <p class="text-secondary">Ҷустуҷӯ ва интихоби хатсайри қатора</p>
+        </div>
+
+        <section class="panel p-4 p-md-5">
+            <h2 class="h4 mb-4">Ҷустуҷӯи чипта</h2>
+
+            <form id="ticket-search-form" action="trains.html" method="get" novalidate>
+                <div class="row g-3">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="from" class="form-label">Аз куҷо</label>
+                            <select id="from" name="from" class="form-select" required aria-describedby="from-error">
+                                <option value="">Истгоҳи рафтанро интихоб кунед</option>
+                                <option value="Душанбе">Душанбе</option>
+                                <option value="Хуҷанд">Хуҷанд</option>
+                                <option value="Бохтар">Бохтар</option>
+                                <option value="Кӯлоб">Кӯлоб</option>
+                            </select>
+                            <div id="from-error" class="error" aria-live="polite"></div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="to" class="form-label">Ба куҷо</label>
+                            <select id="to" name="to" class="form-select" required aria-describedby="to-error">
+                                <option value="">Истгоҳи омаданро интихоб кунед</option>
+                                <option value="Душанбе">Душанбе</option>
+                                <option value="Хуҷанд">Хуҷанд</option>
+                                <option value="Бохтар">Бохтар</option>
+                                <option value="Кӯлоб">Кӯлоб</option>
+                            </select>
+                            <div id="to-error" class="error" aria-live="polite"></div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="date" class="form-label">Санаи сафар</label>
+                            <input type="date" id="date" name="date" class="form-control" required min="2026-01-01"
+                                aria-describedby="date-error">
+                            <div id="date-error" class="error" aria-live="polite"></div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="passengers" class="form-label">Шумораи мусофирон</label>
+                            <input type="number" id="passengers" name="passengers" class="form-control" value="1"
+                                min="1" max="6" required aria-describedby="passengers-error">
+                            <div id="passengers-error" class="error" aria-live="polite"></div>
+                        </div>
+
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-info w-100 fw-bold">
+                                Ҷустуҷӯи қатора
+                            </button>
+                        </div>
+                    </div>
+            </form>
+        </section>
+
+        <section class="panel p-4 mt-4">
+            <h2 class="h5 mb-3">Ҷустуҷӯи фаврии хатсайрҳо</h2>
+            <label for="trip-live-search" class="form-label">Номи шаҳр ё рақами қатора</label>
+            <input type="search" id="trip-live-search" class="form-control" maxlength="80" autocomplete="off"
+                placeholder="Масалан: Душанбе">
+
+            <div id="trip-search-results" class="mt-3 hidden" aria-live="polite"></div>
+        </section>
+    </main>
+
+    <script type="module" src="../assets/js/app.js"></script>
+</body>
+
+</html>

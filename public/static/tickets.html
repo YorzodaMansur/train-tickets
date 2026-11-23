@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="tg">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чиптаҳои ман — Роҳи Оҳани Тоҷикистон</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background: #0f172a;
+            color: #f8fafc;
+        }
+
+        .panel {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 16px;
+        }
+
+        .ticket {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 12px;
+        }
+
+        .modal-content {
+            background: #1e293b;
+            color: white;
+            border: 1px solid #475569;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-dark bg-dark border-bottom border-secondary">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.html">🚆 Роҳи Оҳани Тоҷикистон</a>
+            <a class="btn btn-outline-info btn-sm" href="trains.html">Қатораҳо</a>
+        </div>
+    </nav>
+
+    <main class="container py-5">
+        <h1 class="fw-bold mb-2">Чиптаҳои ман</h1>
+        <p class="text-secondary mb-4">Идоракунии чиптаҳои электронии шумо</p>
+
+        <section class="panel p-4">
+            <article class="ticket p-3 mb-3">
+                <div class="d-flex flex-wrap justify-content-between gap-3">
+                    <div>
+                        <span class="badge text-bg-success mb-2">Пардохтшуда</span>
+                        <h2 class="h5">Душанбе → Хуҷанд</h2>
+                        <p class="text-secondary mb-1">Қатора № 007/008</p>
+                        <p class="text-secondary mb-1">Сана: 25.11.2026</p>
+                        <p class="text-secondary mb-0">Вагон: 2 | Ҷой: 15</p>
+                    </div>
+
+                    <div class="d-flex align-items-center">
+                        <form method="post" action="/api/tickets/cancel.php" class="js-confirm-form"
+                            data-confirm-message="Оё мехоҳед чиптаи Душанбе — Хуҷандро бекор кунед?">
+                            <input type="hidden" name="ticket_id" value="1">
+                            <button type="submit" class="btn btn-outline-danger">
+                                Бекор кардани чипта
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </article>
+
+            <p class="text-secondary small mb-0">
+                Ин маълумот барои намоиши интерфейси лабораторӣ истифода мешавад.
+            </p>
+        </section>
+    </main>
+
+    <!-- Равзанаи тасдиқ -->
+    <div class="modal fade" id="confirm-modal" tabindex="-1" aria-labelledby="confirm-modal-title" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-secondary">
+                    <h2 class="modal-title fs-5" id="confirm-modal-title">
+                        Тасдиқи амал
+                    </h2>
+                    <button type="button" class="btn-close btn-close-white" data-modal-cancel
+                        aria-label="Пӯшидан"></button>
+                </div>
+
+                <div class="modal-body">
+                    <p id="confirm-modal-text" class="mb-0">
+                        Оё шумо ин амалро иҷро кардан мехоҳед?
+                    </p>
+                </div>
+
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-modal-cancel>
+                        Не, бекор кардан
+                    </button>
+                    <button type="button" class="btn btn-danger" data-modal-confirm>
+                        Ҳа, тасдиқ мекунам
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="../assets/js/app.js"></script>
+</body>
+
+</html>
