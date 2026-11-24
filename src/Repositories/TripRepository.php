@@ -1,102 +1,262 @@
 <?php
-namespace App\Repositories;
 
-use App\Core\Database;
+declare(strict_types=1);
 
-class TripRepository {
-    private Database $db;
+class TripRepository
+{
+    public function __construct(private PDO $db) {}
 
-    public function __construct() {
-        $this->db = Database::getInstance();
-    }
+    public function paginate(
+        string $search,
+        string $status,
+        string $dateFrom,
+        string $dateTo,
+        int $page,
+        int $perPage
+    ): array {
+        $where = [];
+        $params = [];
 
-    public function searchTrips(int $originId, int $destinationId, ?string $date = null): array {
-        // Озод кардани ҷойҳои мӯҳлаташон гузашта пеш аз ҷустуҷӯ
-        (new SeatRepository())->releaseExpiredLocks();
+        if ($search !== '') {
+            $where[] = "(
+                t.train_number LIKE :search ESCAPE '!'
+                OR t.train_name LIKE :search ESCAPE '!'
+                OR r.name LIKE :search ESCAPE '!'
+                OR s1.name_tj LIKE :search ESCAPE '!'
+                OR s2.name_tj LIKE :search ESCAPE '!'
+            )";
 
-        $params = [$originId, $destinationId];
-        $dateFilter = "";
-        if (!empty($date)) {
-            $dateFilter = " AND DATE(t.departure_time) = ? ";
-            $params[] = $date;
+            $escaped = str_replace(
+                ['!', '%', '_'],
+                ['!!', '!%', '!_'],
+                $search
+            );
+
+            $params['search'] = '%' . $escaped . '%';
         }
 
-        $sql = "SELECT 
-                    t.id AS trip_id,
-                    t.train_number,
-                    t.departure_time,
-                    t.arrival_time,
-                    t.status,
-                    t.base_price,
-                    r.name AS route_name,
-                    r.distance_km,
-                    r.estimated_minutes,
-                    s_orig.name_tj AS origin_name,
-                    s_orig.city AS origin_city,
-                    s_dest.name_tj AS dest_name,
-                    s_dest.city AS dest_city,
-                    COUNT(DISTINCT c.id) AS cars_count,
-                    COUNT(CASE WHEN s.status = 'available' THEN 1 END) AS available_seats,
-                    COUNT(s.id) AS total_seats
-                FROM trips t
-                JOIN routes r ON t.route_id = r.id
-                JOIN stations s_orig ON r.origin_station_id = s_orig.id
-                JOIN stations s_dest ON r.destination_station_id = s_dest.id
-                LEFT JOIN cars c ON c.trip_id = t.id
-                LEFT JOIN seats s ON s.car_id = c.id
-                WHERE r.origin_station_id = ? 
-                  AND r.destination_station_id = ?
-                  {$dateFilter}
-                GROUP BY t.id, t.train_number, t.departure_time, t.arrival_time, t.status, t.base_price,
-                         r.name, r.distance_km, r.estimated_minutes, s_orig.name_tj, s_orig.city, s_dest.name_tj, s_dest.city
-                ORDER BY t.departure_time ASC";
+        if ($status !== '') {
+            $where[] = 'tr.status = :status';
+            $params['status'] = $status;
+        }
 
-        return $this->db->fetchAll($sql, $params);
+        if ($dateFrom !== '') {
+            $where[] = 'DATE(tr.departure_time) >= :date_from';
+            $params['date_from'] = $dateFrom;
+        }
+
+        if ($dateTo !== '') {
+            $where[] = 'DATE(tr.departure_time) <= :date_to';
+            $params['date_to'] = $dateTo;
+        }
+
+        $whereSql = $where
+            ? 'WHERE ' . implode(' AND ', $where)
+            : '';
+
+        $countSql = "
+            SELECT COUNT(*)
+            FROM trips tr
+            INNER JOIN trains t ON t.id = tr.train_id
+            INNER JOIN routes r ON r.id = tr.route_id
+            INNER JOIN stations s1 ON s1.id = r.origin_station_id
+            INNER JOIN stations s2 ON s2.id = r.destination_station_id
+            $whereSql
+        ";
+
+        $countStmt = $this->db->prepare($countSql);
+        $countStmt->execute($params);
+        $total = (int)$countStmt->fetchColumn();
+
+        $offset = ($page - 1) * $perPage;
+
+        $sql = "
+            SELECT
+                tr.id,
+                tr.train_id,
+                tr.route_id,
+                tr.departure_time,
+                tr.arrival_time,
+                tr.status,
+                tr.base_price,
+                t.train_number,
+                t.train_name,
+                r.name AS route_name,
+                s1.name_tj AS origin_name,
+                s2.name_tj AS destination_name
+            FROM trips tr
+            INNER JOIN trains t ON t.id = tr.train_id
+            INNER JOIN routes r ON r.id = tr.route_id
+            INNER JOIN stations s1 ON s1.id = r.origin_station_id
+            INNER JOIN stations s2 ON s2.id = r.destination_station_id
+            $whereSql
+            ORDER BY tr.departure_time DESC
+            LIMIT :limit OFFSET :offset
+        ";
+
+        $stmt = $this->db->prepare($sql);
+
+        foreach ($params as $key => $value) {
+            $stmt->bindValue(':' . $key, $value, PDO::PARAM_STR);
+        }
+
+        $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+
+        $stmt->execute();
+
+        return [
+            'items' => $stmt->fetchAll(),
+            'total' => $total,
+            'pages' => max(1, (int)ceil($total / $perPage)),
+        ];
     }
 
-    public function getAll(): array {
-        $sql = "SELECT t.*, r.name AS route_name,
-                       s_orig.name_tj AS origin_name, s_dest.name_tj AS dest_name,
-                       COUNT(DISTINCT c.id) AS cars_count
-                FROM trips t
-                JOIN routes r ON t.route_id = r.id
-                JOIN stations s_orig ON r.origin_station_id = s_orig.id
-                JOIN stations s_dest ON r.destination_station_id = s_dest.id
-                LEFT JOIN cars c ON c.trip_id = t.id
-                GROUP BY t.id
-                ORDER BY t.departure_time DESC";
-        return $this->db->fetchAll($sql);
-    }
-
-    public function getById(int $id): ?array {
-        $sql = "SELECT t.*, r.name AS route_name, r.distance_km,
-                       s_orig.name_tj AS origin_name, s_dest.name_tj AS dest_name
-                FROM trips t
-                JOIN routes r ON t.route_id = r.id
-                JOIN stations s_orig ON r.origin_station_id = s_orig.id
-                JOIN stations s_dest ON r.destination_station_id = s_dest.id
-                WHERE t.id = ?";
-        return $this->db->fetchOne($sql, [$id]);
-    }
-
-    public function create(array $data): int {
-        $this->db->query(
-            "INSERT INTO trips (train_number, route_id, departure_time, arrival_time, status, base_price) 
-             VALUES (?, ?, ?, ?, ?, ?)",
-            [
-                $data['train_number'],
-                $data['route_id'],
-                $data['departure_time'],
-                $data['arrival_time'],
-                $data['status'] ?? 'scheduled',
-                $data['base_price']
-            ]
+    public function find(int $id): ?array
+    {
+        $stmt = $this->db->prepare(
+            "SELECT * FROM trips WHERE id = :id LIMIT 1"
         );
-        return $this->db->lastInsertId();
+
+        $stmt->execute(['id' => $id]);
+
+        $row = $stmt->fetch();
+
+        return $row ?: null;
     }
 
-    public function delete(int $id): bool {
-        $this->db->query("DELETE FROM trips WHERE id = ?", [$id]);
-        return true;
+    public function create(array $data): int
+    {
+        $sql = "
+            INSERT INTO trips (
+                train_id,
+                route_id,
+                departure_time,
+                arrival_time,
+                status,
+                base_price
+            ) VALUES (
+                :train_id,
+                :route_id,
+                :departure_time,
+                :arrival_time,
+                :status,
+                :base_price
+            )
+        ";
+
+        $stmt = $this->db->prepare($sql);
+
+        $stmt->execute([
+            'train_id' => (int)$data['train_id'],
+            'route_id' => (int)$data['route_id'],
+            'departure_time' => str_replace(
+                'T',
+                ' ',
+                $data['departure_time']
+            ) . ':00',
+            'arrival_time' => str_replace(
+                'T',
+                ' ',
+                $data['arrival_time']
+            ) . ':00',
+            'status' => $data['status'],
+            'base_price' => $data['base_price'],
+        ]);
+
+        return (int)$this->db->lastInsertId();
+    }
+
+    public function update(int $id, array $data): bool
+    {
+        $sql = "
+            UPDATE trips SET
+                train_id = :train_id,
+                route_id = :route_id,
+                departure_time = :departure_time,
+                arrival_time = :arrival_time,
+                status = :status,
+                base_price = :base_price
+            WHERE id = :id
+        ";
+
+        $stmt = $this->db->prepare($sql);
+
+        return $stmt->execute([
+            'id' => $id,
+            'train_id' => (int)$data['train_id'],
+            'route_id' => (int)$data['route_id'],
+            'departure_time' => str_replace(
+                'T',
+                ' ',
+                $data['departure_time']
+            ) . ':00',
+            'arrival_time' => str_replace(
+                'T',
+                ' ',
+                $data['arrival_time']
+            ) . ':00',
+            'status' => $data['status'],
+            'base_price' => $data['base_price'],
+        ]);
+    }
+
+    public function delete(int $id): bool
+    {
+        $stmt = $this->db->prepare(
+            "DELETE FROM trips WHERE id = :id"
+        );
+
+        return $stmt->execute(['id' => $id]);
+    }
+
+    public function existsDuplicateSchedule(
+        int $trainId,
+        string $departureTime,
+        ?int $ignoreId = null
+    ): bool {
+        $sql = "
+            SELECT 1
+            FROM trips
+            WHERE train_id = :train_id
+              AND departure_time = :departure_time
+        ";
+
+        if ($ignoreId !== null) {
+            $sql .= " AND id <> :ignore_id";
+        }
+
+        $sql .= " LIMIT 1";
+
+        $stmt = $this->db->prepare($sql);
+
+        $params = [
+            'train_id' => $trainId,
+            'departure_time' => $departureTime,
+        ];
+
+        if ($ignoreId !== null) {
+            $params['ignore_id'] = $ignoreId;
+        }
+
+        $stmt->execute($params);
+
+        return (bool)$stmt->fetchColumn();
+    }
+
+    public function reportByRoute(): array
+    {
+        $sql = "
+            SELECT
+                r.name AS route_name,
+                COUNT(tr.id) AS trip_count,
+                COALESCE(SUM(tr.base_price), 0) AS total_price
+            FROM routes r
+            LEFT JOIN trips tr ON tr.route_id = r.id
+            GROUP BY r.id, r.name
+            ORDER BY trip_count DESC, r.name
+        ";
+
+        return $this->db->query($sql)->fetchAll();
     }
 }
