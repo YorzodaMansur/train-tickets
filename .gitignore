@@ -1,5 +1,18 @@
-# Sessions and temporary caches
-storage/sessions/*
-!storage/sessions/.gitkeep
+
+# Composer dependencies
+/vendor/
+
+# Private configuration
+/config/config.php
+.env
+
+# Logs
 *.log
-database/*.sqlite-journal
+
+# Temporary files
+*.tmp
+.DS_Store
+
+# Session files
+/storage/sessions/*
+!/storage/sessions/.gitkeep

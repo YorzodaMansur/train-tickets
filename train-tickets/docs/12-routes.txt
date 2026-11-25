@@ -1,0 +1,60 @@
+ЛАБОРАТОРИЯИ №12 — Санҷиши масирҳо (Routes)
+Лоиҳа: train-tickets
+PHP: 8.2+
+Эзоҳ: ин файл қолаби санҷиш аст. Рамзҳои зерро бо иҷрои фармонҳо дар компютери худ тасдиқ кунед.
+
+1. Оғози сервери дохилии PHP
+Аз папкаи train-tickets иҷро кунед:
+    composer dump-autoload
+    php -S localhost:8000 -t public
+
+2. Санҷиши масирҳои GET
+Фармонҳо (Windows PowerShell ё CMD; агар curl alias халал расонад, curl.exe истифода баред):
+
+    curl.exe -i http://localhost:8000/
+Интизорӣ: HTTP/1.1 200 OK
+
+    curl.exe -i http://localhost:8000/trips
+Интизорӣ: HTTP/1.1 200 OK
+
+    curl.exe -i http://localhost:8000/trips/1
+Интизорӣ: HTTP/1.1 200 OK
+
+    curl.exe -i http://localhost:8000/stations
+Интизорӣ: HTTP/1.1 200 OK
+
+    curl.exe -i http://localhost:8000/login
+Интизорӣ: HTTP/1.1 200 OK
+
+    curl.exe -i http://localhost:8000/register
+Интизорӣ: HTTP/1.1 200 OK
+
+3. Санҷиши 404 — саҳифаи нодуруст
+    curl.exe -i http://localhost:8000/not-found
+Интизорӣ: HTTP/1.1 404 Not Found
+
+4. Санҷиши 404 — ID-и мавҷуднабуда
+    curl.exe -i http://localhost:8000/trips/999
+Интизорӣ: HTTP/1.1 404 Not Found
+
+5. Санҷиши 405 — методи нодуруст
+Масири /trips танҳо GET қабул мекунад:
+    curl.exe -i -X POST http://localhost:8000/trips
+Интизорӣ: HTTP/1.1 405 Method Not Allowed
+Сарлавҳаи Allow бояд GET бошад.
+
+6. Ҷадвали ҷамъбастӣ
+GET /                 200
+GET /trips            200
+GET /trips/1          200
+GET /stations         200
+GET /login            200
+GET /register         200
+GET /not-found        404
+GET /trips/999        404
+POST /trips           405
+
+Муҳим:
+- Рамзҳои «Интизорӣ» натиҷаи пешбинишуда мебошанд. Пас аз иҷрои curl.exe натиҷаи воқеиро муқоиса кунед.
+- Додаҳои сафар ва истгоҳҳо муваққатан дар контроллерҳо ҷойгиранд; дар ин лаборатория пайвастшавӣ ба MySQL талаб нашудааст.
+- Агар Composer насб бошад, vendor/autoload.php бо composer dump-autoload сохта мешавад.

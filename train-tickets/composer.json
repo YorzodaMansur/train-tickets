@@ -1,0 +1,13 @@
+{
+  "name": "train-tickets/lab-12",
+  "description": "Лабораторияи 12 — Front Controller, Router ва View барои системаи чиптаҳои қатора",
+  "type": "project",
+  "require": {
+    "php": ">=8.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/"
+    }
+  }
+}
